@@ -1,0 +1,30 @@
+table,
+th,
+td {
+  text-align: center;
+  border: 2px solid black;
+  border-collapse: collapse;
+  padding: 10px;
+}
+
+table {
+  width: 100%;
+}
+
+th {
+  font-size: 120%;
+  background-color: darkslategrey;
+  color: whitesmoke;
+}
+
+td {
+  padding: 5px;
+}
+
+tr {
+  background-color: whitesmoke;
+}
+
+tr:hover {
+  background-color: lightslategray;
+}

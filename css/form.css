@@ -1,0 +1,33 @@
+table,
+th,
+td {
+  text-align: center;
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding: 5px;
+  background-color: whitesmoke;
+}
+
+table {
+  margin: auto;
+  width: 500px;
+  border: 2px solid black;
+}
+
+th {
+  width: 33%;
+  border-right: 2px solid black;
+}
+
+.allBoarder {
+  border: 2px solid black;
+}
+
+button {
+  padding: 3px;
+  width: 40px;
+}
+
+input {
+  text-align: center;
+}
