@@ -32,12 +32,22 @@
         <tr>
           <th><label for="datumVys">Datum vysílání</label></th>
           <td><input type="date" id="datumVys"></td>
-          <th><input type="checkbox" id="pp"><label for="pp">PP</label></th>
+          <th><input type="checkbox" id="pp" style="width:auto;"><label for="pp">PP</label></th>
+        </tr>
+        <tr>
+          <th><label for="strihac">Střihač</label></th>
+          <td colspan="2"><input type="text" id="strihac"></td>
+        </tr>
+        <tr>
+          <th>Stopáž</th>
+          <td><input type="text" id="in" onblur="formatTc(this)"></td>
+          <td><input type="text" id="out" onblur="formatTc(this)"></td>
         </tr>
         <tr class="allBoarder">
-          <th>Stopáž</th>
-          <td><input type="text" id="in" onblur="formatTc(this.id)"></td>
-          <td><input type="text" id="out" onblur="formatTc(this.id)"></td>
+          <th colspan="3">
+            Poznámky
+            <input type="checkbox" id="komentar" style="width:auto;" onclick="commentCheck(this, this.parentNode)"><br>
+          </th>
         </tr>
         <tr class="allBoarder">
           <th colspan="3">

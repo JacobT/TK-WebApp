@@ -29,5 +29,12 @@ button {
 }
 
 input {
+  width: 80%;
   text-align: center;
+}
+
+textarea {
+  width: 100%;
+  min-width: max-content;
+  max-width: 480px;
 }
