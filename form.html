@@ -51,9 +51,20 @@
         </tr>
         <tr class="allBoarder">
           <th colspan="3">
-            <button type="button" onclick="addBreak()"><b>+</b></button>
+            <button type="button" id="plusBreak" onclick="addBreak()"><b>+</b></button>
             Breaky
-            <button type="button" onclick="deleteBreak()"><b>-</b></button>
+            <button type="button" id="minusBreak" onclick="deleteBreak()"><b>-</b></button>
+          </th>
+        </tr>
+        <tr>
+          <th colspan="3">
+            <label for="koprSelect">Kopr</label>
+            <select id="koprSelect" onchange="koprSelection(this, this.parentNode)"><br>
+              <option value="ok">OK</option>
+              <option value="ok-provys">OK - Čeká na provys</option>
+              <option value="ng-vys">NG_Vysílatelné</option>
+              <option value="ng-nevys">NG_Nevysílatelné</option>
+            </select>
           </th>
         </tr>
       </table>

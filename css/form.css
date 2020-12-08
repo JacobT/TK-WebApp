@@ -38,3 +38,20 @@ textarea {
   min-width: max-content;
   max-width: 480px;
 }
+
+.ok {
+  background-color: aquamarine;
+}
+
+.ok-provys {
+  background-color: darkkhaki;
+}
+
+.ng-vys {
+  background-color: darkorange;
+}
+
+.ng-nevys {
+  background-color: darkred;
+  color: whitesmoke;
+}

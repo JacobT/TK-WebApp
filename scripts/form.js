@@ -53,13 +53,39 @@ function commentCheck(checkBox, parentCell) {
         parentCell.appendChild(textArea);
     } else {
         let textArea = document.getElementById("komentarText");
-        if (textArea.value == "") {
-            textArea.remove();
-        } else {
-            if (confirm("Poznámky nebudou uloženy.\nChcete pokračovat?")) {
+        if (textArea) {
+            if (textArea.value == "") {
                 textArea.remove();
             } else {
-                checkBox.checked = true;
+                if (confirm("Poznámky nebudou uloženy.\nChcete pokračovat?")) {
+                    textArea.remove();
+                } else {
+                    checkBox.checked = true;
+                }
+            }
+        }
+    }
+}
+
+function koprSelection(select, parentCell) {
+    let option = select.value
+    parentCell.className = option;
+    if (option == "ng-vys" || option == "ng-nevys") {
+        if (!document.getElementById("koprText")) {
+            let textArea = document.createElement("textarea");
+            textArea.setAttribute("id", "koprText");
+            textArea.setAttribute("rows", "5");
+            parentCell.appendChild(textArea);
+        }
+    } else {
+        let textArea = document.getElementById("koprText");
+        if (textArea){
+            if (textArea.value == "") {
+                textArea.remove();
+            } else {
+                if (confirm("Poznámky nebudou uloženy.\nChcete pokračovat?")) {
+                    textArea.remove();
+                } 
             }
         }
     }
