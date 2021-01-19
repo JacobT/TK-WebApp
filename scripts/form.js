@@ -1,31 +1,34 @@
 var breakCount = 0;
 
 function addBreak() {
-    let table = document.getElementById("formTable");
-    
-    let newRow = table.insertRow(-1);
-    newRow.className = "break";
+    let breakTable = document.getElementById("breakTable");
+
+    let newRow = breakTable.insertRow();
+    newRow.className = "breakTable";
     
     let header = document.createElement("th");
     breakCount += 1;
+    header.className = "breakTable"
     header.innerHTML = breakCount;
     newRow.appendChild(header);
 
-    let inCell = newRow.insertCell(1);
+    let inCell = newRow.insertCell();
     let inInput = document.createElement("input");
+    inCell.className = "breakTable breakMiddle"
     inInput.setAttribute("id", "break " + breakCount + " in");
     inInput.onblur = function() {formatTc(this)};
     inCell.appendChild(inInput);
 
-    let outCell = newRow.insertCell(2);
+    let outCell = newRow.insertCell();
     let outInput = document.createElement("input");
+    outCell.className = "breakTable"
     outInput.setAttribute("id", "break " + breakCount + " out");
     outInput.onblur = function() {formatTc(this)};
     outCell.appendChild(outInput);
 }
 
 function deleteBreak() {
-    let table = document.getElementById("formTable")
+    let table = document.getElementById("breakTable")
     if (breakCount > 0) {
         table.deleteRow(-1);
         breakCount -= 1;
@@ -45,8 +48,9 @@ function formatTc(element) {
     }
 }
 
-function commentCheck(checkBox, parentCell) {
+function commentCheck(checkBox) {
     if (checkBox.checked) {
+        let parentCell = checkBox.parentNode
         let textArea = document.createElement("textarea");
         textArea.setAttribute("id", "komentarText");
         textArea.setAttribute("rows", "5");
@@ -67,10 +71,11 @@ function commentCheck(checkBox, parentCell) {
     }
 }
 
-function koprSelection(select, parentCell) {
+function koprSelection(select) {
+    let parentCell = select.parentNode
     let option = select.value
     parentCell.className = option;
-    if (option == "ng-vys" || option == "ng-nevys") {
+    if (option == "koprNg_vys" || option == "koprNg_nevys") {
         if (!document.getElementById("koprText")) {
             let textArea = document.createElement("textarea");
             textArea.setAttribute("id", "koprText");

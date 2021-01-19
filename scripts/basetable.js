@@ -4,7 +4,7 @@ let data = [{
         "nazevPoradu": "Nebezpečné vztahy",
         "nazevEpizody": "Z ruky do huby_1407",
         "dur": "00:39:55:19",
-        "status": "waiting"
+        "status": "koprCeka"
     },
     {
         "houseId": "818873A",
@@ -12,7 +12,15 @@ let data = [{
         "nazevPoradu": "Jak to dopadlo",
         "nazevEpizody": "Iluze rodiny_543",
         "dur": "00:39:10:18",
-        "status": "ok"
+        "status": "koprOk"
+    },
+    {
+        "houseId": "819058A",
+        "idec": "21/103/00001/0011",
+        "nazevPoradu": "Jasně a stručně",
+        "nazevEpizody": "18.1.2021",
+        "dur": "00:08:31:13",
+        "status": "koprOk_provys"
     },
     {
         "houseId": "818831A",
@@ -20,7 +28,7 @@ let data = [{
         "nazevPoradu": "Moje zprávy",
         "nazevEpizody": "23.11.2020",
         "dur": "00:08:46:13",
-        "status": "ng-vys"
+        "status": "koprNg_vys"
     },
     {
         "houseId": "818861A",
@@ -28,7 +36,7 @@ let data = [{
         "nazevPoradu": "Jak to dopadlo",
         "nazevEpizody": "Jen jsem chtěl víc_539",
         "dur": "00:39:03:21",
-        "status": "ng-nevys"
+        "status": "koprNg_nevys"
     },
     {
         "houseId": "818832A",
@@ -36,30 +44,65 @@ let data = [{
         "nazevPoradu": "Jasně a stručně",
         "nazevEpizody": "23.11.2020",
         "dur": "00:08:03:20",
-        "status": "waiting"
-    }
+        "status": "koprCeka"
+    },
 ]
 
-let table = document.getElementById("table");
-for (entry of data) {    
-    let row = table.insertRow(-1);
-    row.insertCell(0).innerHTML = entry.houseId;
-    row.insertCell(1).innerHTML = entry.idec;
-    row.insertCell(2).innerHTML = entry.nazevPoradu;
-    row.insertCell(3).innerHTML = entry.nazevEpizody;
-    row.insertCell(4).innerHTML = entry.dur;
+class TableContent {
+    constructor(data) {
+        this.data = data;
+        this.table = document.getElementById("baseTable");
+        this.print(this.data);
+    }
 
-    let statusCell = row.insertCell(5);
-    if (entry.status == "waiting") {
-        statusCell.innerHTML = "Čeká na KOPR";
-    } else if (entry.status == "ok") {
-        statusCell.innerHTML = "KOPR OK";
-        statusCell.style.backgroundColor = "green";
-    } else if (entry.status == "ng-vys") {
-        statusCell.innerHTML = "NG-Vysílatelné";
-        statusCell.style.backgroundColor = "yellow";
-    } else if (entry.status == "ng-nevys") {
-        statusCell.innerHTML = "NEVYSÍLATELNÉ";
-        statusCell.style.backgroundColor = "red";
-    }   
+    print(data) {
+        let newTable = document.createElement("tbody");
+        newTable.setAttribute("id", "baseTable");
+        for (let entry of data) {
+            let row = newTable.insertRow();
+            row.insertCell().innerHTML = entry.houseId;
+            row.insertCell().innerHTML = entry.idec;
+            row.insertCell().innerHTML = entry.nazevPoradu;
+            row.insertCell().innerHTML = entry.nazevEpizody;
+            row.insertCell().innerHTML = entry.dur;
+
+            let statusCell = row.insertCell();
+            let status = entry.status
+            switch (status) {
+                case "koprCeka":
+                    statusCell.innerHTML = "Čeká na KOPR";
+                    break;
+                case "koprOk":
+                    statusCell.innerHTML = "KOPR OK";
+                    statusCell.className = status;
+                    break;
+                case "koprOk_provys":
+                    statusCell.innerHTML = "KOPR OK - Čeká na ProVys";
+                    statusCell.className = status;
+                    break;
+                case "koprNg_vys":
+                    statusCell.innerHTML = "NG-Vysílatelné";
+                    statusCell.className = status;
+                    break;
+                case "koprNg_nevys":
+                    statusCell.innerHTML = "NEVYSÍLATELNÉ";
+                    statusCell.className = status;
+                    break;
+            }
+        }
+        this.table.parentNode.replaceChild(newTable, this.table);
+        this.table = newTable;
+    }
+
+    filterByStatus(status) {
+        let filteredData = [];
+        for (let entry of this.data) {
+            if (entry.status == status) {
+                filteredData.push(entry);
+            }
+        }
+        this.print(filteredData);
+    }
 }
+
+let table = new TableContent(data);

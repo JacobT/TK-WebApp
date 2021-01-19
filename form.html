@@ -7,6 +7,7 @@
     <title>Form</title>
 
     <link rel="stylesheet" href="css/form.css">
+    <link rel="stylesheet" href="css/kopr_classes.css">
   </head>
   <body>
     <script src="scripts/form.js"></script>
@@ -46,25 +47,28 @@
         <tr class="allBoarder">
           <th colspan="3">
             Poznámky
-            <input type="checkbox" id="komentar" style="width:auto;" onclick="commentCheck(this, this.parentNode)"><br>
+            <input type="checkbox" id="komentar" style="width:auto;" onclick="commentCheck(this)"><br>
           </th>
         </tr>
         <tr class="allBoarder">
-          <th colspan="3">
+          <th class="breakCell" colspan="3">
             <button type="button" id="plusBreak" onclick="addBreak()"><b>+</b></button>
             Breaky
             <button type="button" id="minusBreak" onclick="deleteBreak()"><b>-</b></button>
+            <table id="breakTable" class="breakTable"></table>
           </th>
         </tr>
         <tr>
           <th colspan="3">
             <label for="koprSelect">Kopr</label>
-            <select id="koprSelect" onchange="koprSelection(this, this.parentNode)"><br>
-              <option value="ok">OK</option>
-              <option value="ok-provys">OK - Čeká na provys</option>
-              <option value="ng-vys">NG_Vysílatelné</option>
-              <option value="ng-nevys">NG_Nevysílatelné</option>
+            <select id="koprSelect" onchange="koprSelection(this)">
+              <option value="koprCeka">Čeká na KOPR</option>
+              <option value="koprOk">OK</option>
+              <option value="koprOk_provys">OK - Čeká na provys</option>
+              <option value="koprNg_vys">NG_Vysílatelné</option>
+              <option value="koprNg_nevys">NG_Nevysílatelné</option>
             </select>
+            <br>
           </th>
         </tr>
       </table>

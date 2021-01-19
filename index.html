@@ -7,13 +7,34 @@
     <title>TK Webapp</title>
 
     <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/kopr_classes.css">
   </head>
   <body>
-    <ul>
-      <li><a href="basetable.html" target="displayFrame">NA KOPR</a></li>
-      <li><a href="form.html" target="displayFrame">NOVÝ</a></li>
-    </ul>
+    <nav>
+      <ul>
+        <li onclick="table.print(table.data)">VŠE</li>
+        <li onclick="table.filterByStatus('koprCeka')">NA KOPR</li>
+        <li onclick="table.filterByStatus('koprOk')">KOPR OK</li>
+        <li onclick="table.filterByStatus('koprOk_provys')">KOPR OK - ČEKÁ NA PROVYS</li>
+        <li onclick="table.filterByStatus('koprNg_vys')">NG_VYSÍLATELNÉ</li>
+        <li onclick="table.filterByStatus('koprNg_nevys')">NG_NEVYSÍLATELNÉ</li>
+        <li><a href="form.html" target="_blank">NOVÝ</a></li>
+      </ul>
+    </nav>
 
-    <iframe src="basetable.html" frameborder="0" id="displayFrame" name="displayFrame"></iframe>
+    <table>
+      <thead>
+        <tr>
+          <th>House ID</th>
+          <th>IDEC</th>
+          <th>Název pořadu</th>
+          <th>Název epizody</th>
+          <th>Stopáž</th>
+          <th>Stav</th>
+        </tr>
+      </thead>
+      <tbody id="baseTable"></tbody>
+    </table>
+    <script src="scripts/basetable.js"></script>
   </body>
 </html>

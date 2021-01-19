@@ -1,3 +1,7 @@
+body {
+  background-color: lightgray;
+}
+
 table,
 th,
 td {
@@ -25,6 +29,7 @@ th {
 
 button {
   padding: 3px;
+  margin: 3px;
   width: 40px;
 }
 
@@ -39,19 +44,38 @@ textarea {
   max-width: 480px;
 }
 
-.ok {
+.koprCeka {
+  background-color: whitesmoke;
+}
+
+.koprOk {
   background-color: aquamarine;
 }
 
-.ok-provys {
+.koprOk_provys {
   background-color: darkkhaki;
 }
 
-.ng-vys {
+.koprNg_vys {
   background-color: darkorange;
 }
 
-.ng-nevys {
+.koprNg_nevys {
   background-color: darkred;
   color: whitesmoke;
+}
+
+.breakCell {
+  padding: 0px;
+  margin: 0px 5px;
+}
+
+.breakTable {
+  border: none;
+  border-top: 1px solid black;
+}
+
+.breakMiddle {
+  border-right: 1px solid black;
+  border-left: 1px solid black;
 }

@@ -1,0 +1,20 @@
+.koprCeka {
+  background-color: whitesmoke;
+}
+
+.koprOk {
+  background-color: aquamarine;
+}
+
+.koprOk_provys {
+  background-color: darkkhaki;
+}
+
+.koprNg_vys {
+  background-color: darkorange;
+}
+
+.koprNg_nevys {
+  background-color: darkred;
+  color: whitesmoke;
+}
