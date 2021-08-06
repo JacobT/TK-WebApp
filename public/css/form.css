@@ -23,7 +23,7 @@ th {
   border-right: 2px solid black;
 }
 
-.allBoarder {
+.allBorder {
   border: 2px solid black;
 }
 
@@ -42,6 +42,10 @@ textarea {
   width: 100%;
   min-width: max-content;
   max-width: 480px;
+}
+
+.invalid {
+  border-color: red;
 }
 
 .koprCeka {
@@ -78,4 +82,15 @@ textarea {
 .breakMiddle {
   border-right: 1px solid black;
   border-left: 1px solid black;
+}
+
+.submit {
+  background-color: darkslategray;
+}
+
+.warning {
+  color: red;
+  font-size: larger;
+  text-align: center;
+  font-weight: bold;
 }

@@ -2,7 +2,7 @@ html,
 body {
   margin: 0px;
   height: 100%;
-  background-color: lightgray;
+  background-color: gray;
 }
 
 ul {
@@ -19,9 +19,6 @@ ul {
 
 li {
   float: left;
-}
-
-li {
   padding: 10px;
   display: block;
   color: whitesmoke;
@@ -70,6 +67,30 @@ tr {
   background-color: whitesmoke;
 }
 
+.highlight,
 tr:hover {
   background-color: lightslategray;
+}
+
+.searchBox {
+  float: right;
+  margin-top: 5px;
+  margin-right: 1%;
+  padding: 5px;
+}
+
+label {
+  color: whitesmoke;
+  margin-right: 5px;
+}
+
+.navRight {
+  float: right;
+  border-left: 1px solid black;
+  border-right: none;
+}
+
+.active {
+  color: black;
+  background-color: aquamarine;
 }

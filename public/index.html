@@ -12,13 +12,18 @@
   <body>
     <nav>
       <ul>
-        <li onclick="table.print(table.data)">VŠE</li>
-        <li onclick="table.filterByStatus('koprCeka')">NA KOPR</li>
-        <li onclick="table.filterByStatus('koprOk')">KOPR OK</li>
-        <li onclick="table.filterByStatus('koprOk_provys')">KOPR OK - ČEKÁ NA PROVYS</li>
-        <li onclick="table.filterByStatus('koprNg_vys')">NG_VYSÍLATELNÉ</li>
-        <li onclick="table.filterByStatus('koprNg_nevys')">NG_NEVYSÍLATELNÉ</li>
+        <div id="filters">
+          <li name="all">VŠE</li>
+          <li name="status=koprCeka">NA KOPR</li>
+          <li name="status=koprOk">KOPR OK</li>
+          <li name="status=koprProvys">KOPR OK - ČEKÁ NA PROVYS</li>
+          <li name="status=koprNg_vys">NG_VYSÍLATELNÉ</li>
+          <li name="status=koprNg_nevys">NG_NEVYSÍLATELNÉ</li>
+        </div>
         <li><a href="form.html" target="_blank">NOVÝ</a></li>
+        <div class="searchBox">
+          <label for="search">Vyhledat:</label><input type="text" id="search" placeholder="House ID">
+        </div>
       </ul>
     </nav>
 
@@ -31,6 +36,7 @@
           <th>Název epizody</th>
           <th>Stopáž</th>
           <th>Stav</th>
+          <th>Edit</th>
         </tr>
       </thead>
       <tbody id="baseTable"></tbody>
