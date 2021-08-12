@@ -6,7 +6,7 @@ class TableContent {
         this.filters = document.getElementById("filters").children
         this.searchInput = document.getElementById("search")
         this.addListeners()
-        this.loadFromStorage()
+        this.reload()
     }
 
     print(data) {
@@ -20,12 +20,21 @@ class TableContent {
         } else {
             for (let entry of data) {
                 let row = newTable.insertRow()
-                row.onclick = () => this.highlight(row)
+
+                row.addEventListener("click", (e) => {
+                    if (e.target.nodeName !== "BUTTON") {
+                        this.highlight(row)
+                    }
+                })
+
                 row.insertCell().innerHTML = entry.houseId
                 row.insertCell().innerHTML = entry.idec
                 row.insertCell().innerHTML = entry.nazevPoradu
                 row.insertCell().innerHTML = entry.nazevEpizody
                 row.insertCell().innerHTML = entry.dur
+
+                let date = new Date(entry.datumVys)
+                row.insertCell().innerHTML = date.toLocaleDateString()
 
                 let statusCell = row.insertCell()
                 let status = entry.status
@@ -53,16 +62,21 @@ class TableContent {
                 let editCell = row.insertCell()
                 let editBtn = document.createElement("button")
                 editBtn.innerHTML = "Edit"
-                editBtn.onclick = () => {
+                editBtn.addEventListener("click", () => {
                     window.open(`/form.html?houseId=${entry.houseId}`, "_blank")
-                }
+                })
                 editCell.appendChild(editBtn)
 
                 let delBtn = document.createElement("button")
                 delBtn.innerHTML = "Delete"
-                delBtn.onclick = () => {
-                    //http delete request
-                }
+                delBtn.addEventListener ("click", () => {
+                    fetch(`/api/${entry.houseId}`, {method: "DELETE"})
+                        .then((response) => {
+                            if (response.ok == true && response.status == 200) {
+                                location.reload()
+                            }
+                        })
+                })
                 editCell.appendChild(delBtn)
             }
         }
@@ -80,7 +94,7 @@ class TableContent {
     }
 
     search(query) {
-        const xhttp = new XMLHttpRequest()
+        const xhttp = new XMLHttpRequest()  //change to fetch
 
         xhttp.onload = () => {
             let dataString = xhttp.response
@@ -124,7 +138,7 @@ class TableContent {
         }
     }
 
-    loadFromStorage() {
+    reload() {
         let filter = this.storage.getItem("filter")
         if (filter === null) {
             filter = "all"
@@ -140,6 +154,14 @@ class TableContent {
 
 const table = new TableContent()
 
-window.addEventListener("refresh", (e) => {
-    location.reload()
+window.addEventListener("storage", () => {
+    const refresh = window.localStorage.getItem("refresh")
+    if (refresh === "true") {
+        table.reload()
+    }
+    window.localStorage.removeItem("refresh")
+})
+
+window.addEventListener("DOMContentLoaded", () => {
+    setInterval(() => table.reload(), 60000)
 })

@@ -167,6 +167,18 @@ let data = [
         break_9_out: '00:39:12:14',
         status: 'koprCeka'
     },
+    {
+        houseId: '819473S',
+        idec: '21/104/00001/0045',
+        nazevPoradu: 'Naše zprávy',
+        nazevEpizody: '45',
+        datumVys: '2021-08-11',
+        strihac: 'Michal Czech',
+        in: '01:52:00:00',
+        out: '01:56:42:10',
+        dur: '00:04:42:11',
+        status: 'koprOk'
+    },
 ]
 
 module.exports = data

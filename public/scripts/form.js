@@ -1,3 +1,5 @@
+import Timecode from "./smpte-timecode.js"
+
 var breakCounter = 0
 
 function addBreak(count=1) {
@@ -16,17 +18,19 @@ function addBreak(count=1) {
         let inCell = newRow.insertCell()
         let inInput = document.createElement("input")
         inCell.className = "breakTable breakMiddle"
+        inInput.className = "tc"
         inInput.name = `break_${breakCounter}_in`
         inInput.id = `break_${breakCounter}_in`
-        inInput.onblur = () => {formatTc(inInput)}
+        inInput.addEventListener("blur", () => formatTc(inInput))
         inCell.appendChild(inInput)
 
         let outCell = newRow.insertCell()
         let outInput = document.createElement("input")
         outCell.className = "breakTable"
+        outInput.className = "tc"
         outInput.name = `break_${breakCounter}_out`
         outInput.id = `break_${breakCounter}_out`
-        outInput.onblur = () => {formatTc(outInput)}
+        outInput.addEventListener("blur", () => formatTc(outInput))
         outCell.appendChild(outInput)
     }
 }
@@ -41,7 +45,7 @@ function deleteBreak() {
 
 function formatTc(element) {
     let tc = element.value
-    element.className = ""
+    element.classList.remove("invalid")
     if (tc) {
         tc = tc.replace(/:|\.|\s|\D/g, "")
     }
@@ -49,13 +53,13 @@ function formatTc(element) {
         tc = "0".repeat(8 - tc.length) + tc
         element.value = tc.slice(0, 2) + ":" + tc.slice(2, 4) + ":" + tc.slice(4, 6) + ":" + tc.slice(6)
     } else {
-        element.className = "invalid"
+        element.classList.add("invalid")
     }
 }
 
 function formatIdec(element) {
     let idec = element.value
-    element.className = ""
+    element.classList.remove("invalid")
     if (idec) {
         idec = idec.replace(/\/|\s|\D/g, "")
     }
@@ -63,14 +67,14 @@ function formatIdec(element) {
         idec = idec + "0".repeat(14 - idec.length)
         element.value = `${idec.slice(0, 2)}/${idec.slice(2, 5)}/${idec.slice(5, 10)}/${idec.slice(10)}`
     } else {
-        element.className = "invalid"
+        element.classList.add("invalid")
     }
 }
 
 function isFilled (element) {
-    element.className = ""
+    element.classList.remove("invalid")
     if (!element.value) {
-        element.className = "invalid"
+        element.classList.add("invalid")
     }
 }
 
@@ -81,7 +85,7 @@ function commentCheck(checkBox) {
         textArea.name = "komentarText"
         textArea.id = "komentarText"
         textArea.rows = 5
-        textArea.onblur = () => {isFilled(textArea)}
+        textArea.addEventListener("blur", () => isFilled(textArea))
         parentCell.appendChild(textArea)
     } else {
         let textArea = document.getElementById("komentarText")
@@ -108,7 +112,7 @@ function koprSelection(select) {
             textArea.name = "koprText"
             textArea.id = "koprText"
             textArea.rows = 5
-            textArea.onblur = () => {isFilled(textArea)}
+            textArea.addEventListener("blur", () => isFilled(textArea))
             parentCell.appendChild(textArea)
         }
     } else {
@@ -130,6 +134,12 @@ function koprSelection(select) {
 }
 
 function fillForm (data) {
+    if (!data) {
+        alert(`Pořad s House ID: ${houseId} nebyl nalezen.`)
+        window.localStorage.setItem("refresh", "true")
+        window.close()
+        return
+    }
     let breaks = {}
     for (let key in data) {
         if (key.startsWith("break_")) {
@@ -142,11 +152,11 @@ function fillForm (data) {
         }
         if (element.type == "checkbox") {
             element.checked = true
-            if (element.onclick) {element.onclick()}
+            element.dispatchEvent(new Event("click"))
             continue
         }
         element.value = data[key]
-        if (element.onchange) {element.onchange()}
+        element.dispatchEvent(new Event("change"))
     }
     addBreak(Object.keys(breaks).length / 2)
     for (let key in breaks) {
@@ -156,39 +166,53 @@ function fillForm (data) {
 }
 
 document.addEventListener("submit", (event) => {
+    event.preventDefault()
     let valid = true
-    let warning = document.getElementById("warning")
     warning.innerHTML = ""
     for (let element of event.target.elements) {
-        element.className = ""
-        if (element.onblur) {
-            element.onblur()
-            if (element.className === "invalid") {
-                warning.innerHTML = "Některá pole nejsou vyplněna."
-                valid = false
-            }
+        element.classList.remove("invalid")
+        element.dispatchEvent(new Event("blur"))
+        if (element.classList.contains("invalid")) {
+            warning.innerHTML = "Některá pole nejsou vyplněna."
+            valid = false
         }
     }
-    if (!valid) {
-        event.preventDefault()
-    } else {
-        event.preventDefault()
-        let data = new FormData(event.target)
-        let dataJson = {}
-        for (let pair of data) {
-            dataJson[pair[0]] = pair[1]
+    if (valid) {
+        let formData = new FormData(event.target)
+        let data = {}
+        for (let item of formData) {
+            data[item[0]] = item[1]
         }
-        fetch("/api", {
-            method: "POST",
+        let url = "/api"
+        let reqMethod = "POST"
+        if (query) {
+            url += `/${houseId}`
+            reqMethod = "PUT"
+        }
+        fetch(url, {
+            method: reqMethod,
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type':'application/json'
             },
-            body: JSON.stringify(test)
-        })
+            body: JSON.stringify(data)
+        }).then((response) => {
+            if (response.ok == true && response.status == 200) {
+                window.localStorage.setItem("refresh", "true")
+                window.close()
+            }
+            else {
+                return response.json()
+            }
+        }).then((resJson => {
+            console.log(resJson)
+        }))
     }
 })
 
+
 const query = window.location.search
+const houseId = new URLSearchParams(query).get("houseId")
+const warning = document.getElementById("warning")
 
 if (query) {
     fetch(`/api/search${query}`)
@@ -202,3 +226,33 @@ if (query) {
 
 let select = document.getElementById("status")
 select.prev = select.value
+
+let elements = document.getElementById("form").elements
+for (let element of elements) {
+    if (element.name == "nazevEpizody" || element.name == "pp" || element.type == "submit") {
+        continue
+    }
+    else if (element.classList.contains("tc")) {
+        element.addEventListener("blur", () => formatTc(element))
+    }
+    else if (element.name == "idec") {
+        element.addEventListener("blur", () => formatIdec(element))
+    }
+    else if (element.name == "komentar") {
+        element.addEventListener("click", () => commentCheck(element))
+    }
+    else if (element.name == "status") {
+        element.addEventListener("change", () => koprSelection(element))
+    }
+    else if (element.type == "button") {
+        if (element.id == "plusBreak") {
+            element.addEventListener("click", () => addBreak())
+        }
+        else {
+            element.addEventListener("click", () => deleteBreak())
+        }
+    }
+    else {
+        element.addEventListener("blur", () => isFilled(element))
+    }
+}

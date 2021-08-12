@@ -11,19 +11,19 @@
   </head>
   <body>
     <p id="warning" class="warning"></p>
-    <form action="/api" method="POST" accept-charset="utf-8" id="form" autocomplete="off">
+    <form action="/api" method="POST" accept-charset="utf-8" id="form" autocomplete="off" enctype="application/x-www-form-urlencoded">
       <table id="formTable">
         <tr>
           <th><label for="houseId">House ID</label></th>
-          <td colspan="2"><input name="houseId" type="text" id="houseId" onblur="isFilled(this)"></td>
+          <td colspan="2"><input name="houseId" type="text" id="houseId"></td>
         </tr>
         <tr>
           <th><label for="idec">IDEC</label></th>
-          <td colspan="2"><input name="idec" type="text" id="idec" onblur="formatIdec(this)"></td>
+          <td colspan="2"><input name="idec" type="text" id="idec"></td>
         </tr>
         <tr>
           <th><label for="nazevPoradu">Pořad</label></th>
-          <td colspan="2"><input name="nazevPoradu" type="text" id="nazevPoradu" onblur="isFilled(this)" autocomplete="on"></td>
+          <td colspan="2"><input name="nazevPoradu" type="text" id="nazevPoradu" autocomplete="on"></td>
         </tr>
         <tr>
           <th><label for="nazevEpizody">Epizoda</label></th>
@@ -31,36 +31,36 @@
         </tr>
         <tr>
           <th><label for="datumVys">Datum vysílání</label></th>
-          <td><input name="datumVys" type="date" id="datumVys" onblur="isFilled(this)"></td>
+          <td><input name="datumVys" type="date" id="datumVys"></td>
           <th><input name="pp" type="checkbox" id="pp" style="width:auto;"><label for="pp">PP</label></th>
         </tr>
         <tr>
           <th><label for="strihac">Střihač</label></th>
-          <td colspan="2"><input name="strihac" type="text" id="strihac" onblur="isFilled(this)" autocomplete="on"></td>
+          <td colspan="2"><input name="strihac" type="text" id="strihac"autocomplete="on"></td>
         </tr>
         <tr>
           <th>Stopáž</th>
-          <td><input name="in" type="text" id="in" onblur="formatTc(this)"></td>
-          <td><input name="out" type="text" id="out" onblur="formatTc(this)"></td>
+          <td><input name="in" type="text" id="in" class="tc"></td>
+          <td><input name="out" type="text" id="out" class="tc"></td>
         </tr>
         <tr class="allBorder">
           <th colspan="3">
             Poznámky
-            <input name="komentar" type="checkbox" id="komentar" style="width:auto;" onclick="commentCheck(this)"><br>
+            <input name="komentar" type="checkbox" id="komentar" style="width:auto;" class="comment"><br>
           </th>
         </tr>
         <tr class="allBorder">
           <th class="breakCell" colspan="3">
-            <button type="button" id="plusBreak" onclick="addBreak()"><b>+</b></button>
+            <button type="button" id="plusBreak"><b>+</b></button>
             Breaky
-            <button type="button" id="minusBreak" onclick="deleteBreak()"><b>-</b></button>
+            <button type="button" id="minusBreak"><b>-</b></button>
             <table id="breakTable" class="breakTable"></table>
           </th>
         </tr>
         <tr>
           <th colspan="3" class="allBorder">
             <label for="status">Kopr</label>
-            <select name="status" id="status" onchange="koprSelection(this)">
+            <select name="status" id="status" class="select">
               <option value="koprCeka">Čeká na KOPR</option>
               <option value="koprOk">OK</option>
               <option value="koprProvys">OK - Čeká na provys</option>
@@ -77,6 +77,6 @@
         </tr>
       </table>
     </form>
-    <script src="scripts/form.js"></script>
+    <script src="scripts/form.js" type="module"></script>
   </body>
 </html>
