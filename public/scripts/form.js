@@ -51,8 +51,12 @@ function formatTc(element) {
     }
     if (tc.length <= 8 && tc != "") {
         tc = "0".repeat(8 - tc.length) + tc
-        element.value = tc.slice(0, 2) + ":" + tc.slice(2, 4) + ":" + tc.slice(4, 6) + ":" + tc.slice(6)
-    } else {
+        tc = tc.slice(0, 2) + ":" + tc.slice(2, 4) + ":" + tc.slice(4, 6) + ":" + tc.slice(6)
+    }
+    try {
+        tc = new Timecode(tc, 25)
+        element.value = tc.toString()
+    } catch (error) {
         element.classList.add("invalid")
     }
 }
@@ -165,50 +169,6 @@ function fillForm (data) {
     }
 }
 
-document.addEventListener("submit", (event) => {
-    event.preventDefault()
-    let valid = true
-    warning.innerHTML = ""
-    for (let element of event.target.elements) {
-        element.classList.remove("invalid")
-        element.dispatchEvent(new Event("blur"))
-        if (element.classList.contains("invalid")) {
-            warning.innerHTML = "Některá pole nejsou vyplněna."
-            valid = false
-        }
-    }
-    if (valid) {
-        let formData = new FormData(event.target)
-        let data = {}
-        for (let item of formData) {
-            data[item[0]] = item[1]
-        }
-        let url = "/api"
-        let reqMethod = "POST"
-        if (query) {
-            url += `/${houseId}`
-            reqMethod = "PUT"
-        }
-        fetch(url, {
-            method: reqMethod,
-            headers: {
-                'Content-Type':'application/json'
-            },
-            body: JSON.stringify(data)
-        }).then((response) => {
-            if (response.ok == true && response.status == 200) {
-                window.localStorage.setItem("refresh", "true")
-                window.close()
-            }
-            else {
-                return response.json()
-            }
-        }).then((resJson => {
-            console.log(resJson)
-        }))
-    }
-})
-
 
 const query = window.location.search
 const houseId = new URLSearchParams(query).get("houseId")
@@ -216,12 +176,12 @@ const warning = document.getElementById("warning")
 
 if (query) {
     fetch(`/api/search${query}`)
-        .then(response => {
-            return response.json()
-        })
-        .then(data => {
-            fillForm(data[0])
-        })
+    .then(response => {
+        return response.json()
+    })
+    .then(data => {
+        fillForm(data[0])
+    })
 }
 
 let select = document.getElementById("status")
@@ -256,3 +216,61 @@ for (let element of elements) {
         element.addEventListener("blur", () => isFilled(element))
     }
 }
+
+document.addEventListener("submit", (event) => {
+    event.preventDefault()
+    let valid = true
+    warning.innerHTML = ""
+    for (let element of event.target.elements) {
+        element.classList.remove("invalid")
+        element.dispatchEvent(new Event("blur"))
+        if (element.classList.contains("invalid")) {
+            warning.innerHTML = "Některá pole nejsou správně vyplněna."
+            valid = false
+        }
+    }
+    if (valid) {
+        let formData = new FormData(event.target)
+        let data = {}
+        for (let item of formData) {
+            data[item[0]] = item[1]
+        }
+
+        let tcIn = new Timecode(data["in"], 25)
+        let tcOut = new Timecode(data["out"], 25)
+        try {
+            let dur = tcOut.subtract(tcIn)
+            dur.add(1)
+            data["dur"] = dur.toString()
+        } catch (error) {
+            if (error == "Error: Negative timecodes not supported") {
+                warning.innerHTML += "\nStopáž pořadu je negativní."
+                let inInput = document.getElementById("in")
+                let outInput = document.getElementById("out")
+                inInput.classList.add("invalid")
+                outInput.classList.add("invalid")
+                return
+            }
+        }
+
+        let url = "/api"
+        let reqMethod = "POST"
+        if (query) {
+            url += `/${houseId}`
+            reqMethod = "PUT"
+        }
+        fetch(url, {
+            method: reqMethod,
+            headers: {
+                'Content-Type':'application/json'
+            },
+            body: JSON.stringify(data)
+        }).then((response) => {
+            if (response.ok && response.status == 200) {
+                window.localStorage.setItem("refresh", "true")
+                window.close()
+            }
+
+        })
+    }
+})

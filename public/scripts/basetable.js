@@ -11,7 +11,7 @@ class TableContent {
 
     print(data) {
         let newTable = document.createElement("tbody")
-        newTable.setAttribute("id", "baseTable")
+        newTable.id = "baseTable"
         if (data.length == 0) {
             let row = newTable.insertRow()
             let cell = row.insertCell()
@@ -38,25 +38,22 @@ class TableContent {
 
                 let statusCell = row.insertCell()
                 let status = entry.status
+                statusCell.classList.add(status)
                 switch (status) {
                     case "koprCeka":
                         statusCell.innerHTML = "Čeká na KOPR"
                         break
                     case "koprOk":
                         statusCell.innerHTML = "KOPR OK"
-                        statusCell.className = status
                         break
                     case "koprProvys":
                         statusCell.innerHTML = "KOPR OK - Čeká na ProVys"
-                        statusCell.className = status
                         break
                     case "koprNg_vys":
                         statusCell.innerHTML = "NG-Vysílatelné"
-                        statusCell.className = status
                         break
                     case "koprNg_nevys":
                         statusCell.innerHTML = "NEVYSÍLATELNÉ"
-                        statusCell.className = status
                         break
                 }
                 let editCell = row.insertCell()
@@ -85,32 +82,39 @@ class TableContent {
     }
 
     highlight (element) {
-        if (element.className === "highlight") {
-            element.className = ""
+        if (element.classList.contains("highlight")) {
+            element.classList.remove("highlight")
         }
         else {
-            element.className = "highlight"
+            element.classList.add("highlight")
         }
     }
 
     search(query) {
-        const xhttp = new XMLHttpRequest()  //change to fetch
-
-        xhttp.onload = () => {
-            let dataString = xhttp.response
-            let data = JSON.parse(dataString)
-            this.print(data)
-            this.storage.setItem("filter", query)
-            this.setActive(query)
-        }
-
+        let url = ""
         if (!query || query === "all") {
-            xhttp.open("GET", `/api/search`)
+            url = `/api/search`
         }
         else {
-            xhttp.open("GET", `/api/search?${query}`)
+            url = `/api/search?${query}`
         }
-        xhttp.send()
+        
+        fetch(url).then(response => {
+            if (response.ok && response.status === 200) {
+                console.log(200)
+                return response.json()
+            }
+            else if (response.status === 304) {   // not getting 304
+                console.log(304)
+            }
+        }).then(data => {
+            console.log(data)
+            if (data) {
+                this.print(data)
+                this.storage.setItem("filter", query)
+                this.setActive(query)
+            }
+        })
     }
 
     addListeners() {
@@ -130,11 +134,11 @@ class TableContent {
 
     setActive(eleName) {
         for (let li of this.filters) {
-            li.className = li.className.replace(" active", "")
+            li.classList.remove("active")
         }
         if (eleName.startsWith("status") || eleName === "all") {
             let activeElement = document.getElementsByName(eleName)[0]
-            activeElement.className = activeElement.className + " active"
+            activeElement.classList.add("active")
         }
     }
 
@@ -163,5 +167,5 @@ window.addEventListener("storage", () => {
 })
 
 window.addEventListener("DOMContentLoaded", () => {
-    setInterval(() => table.reload(), 60000)
+    setInterval(() => table.reload(), 10000)
 })

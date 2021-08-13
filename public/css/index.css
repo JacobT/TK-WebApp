@@ -68,7 +68,7 @@ tr {
 }
 
 .highlight,
-tr:hover {
+tr:hover > td {
   background-color: lightslategray;
 }
 

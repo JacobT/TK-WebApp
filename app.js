@@ -29,26 +29,6 @@ app.get("/api/search", (req, res) => {
 app.post("/api", (req, res) => {
     console.log("post")
     let newEntry = req.body
-    let errorJson = {}
-    try {
-        for (let key of newEntry) {
-            if (key.startsWith("tc") || key.startsWith("break")) {
-                let tc = new Timecode(newEntry[key], 25)
-            }
-        }
-    } catch (error) {
-        // push key to errorJson
-    }
-    try {
-        let tcIn = new Timecode(newEntry.in, 25)
-        let tcOut = new Timecode(newEntry.out, 25)
-        let dur = tcOut.subtract(tcIn)
-        newEntry["dur"] = dur.toString()
-    } catch (error) {
-        if (error == "Error: Negative timecodes not supported") {
-            res.status(422).json({duration: false})
-        }
-    }
     data.push(newEntry)
     res.status(200).send()
 })
