@@ -1,6 +1,5 @@
 const express = require("express")
 const app = express()
-const Timecode = require("smpte-timecode")
 
 var data = require("./data")
 
@@ -20,14 +19,14 @@ app.get("/api/search", (req, res) => {
             return data[item].startsWith(query[item])
         })
     }
-    if (!filteredData) {
+    if (filteredData.length === 0) {
         return res.status(404).send("Data not found.")
     }
     return res.status(200).json(filteredData)
 })
 
 app.post("/api", (req, res) => {
-    console.log("post")
+    console.log("post", req.body)
     let newEntry = req.body
     data.push(newEntry)
     res.status(200).send()

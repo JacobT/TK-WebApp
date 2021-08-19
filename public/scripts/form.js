@@ -22,6 +22,7 @@ function addBreak(count=1) {
         inInput.name = `break_${breakCounter}_in`
         inInput.id = `break_${breakCounter}_in`
         inInput.addEventListener("blur", () => formatTc(inInput))
+        inInput.addEventListener("blur", () => fillBreakOut(inInput))
         inCell.appendChild(inInput)
 
         let outCell = newRow.insertCell()
@@ -169,11 +170,89 @@ function fillForm (data) {
     }
 }
 
+function fillBreakOut (inInput) {
+    let id = inInput.id.replace("in", "out")
+    let outCell = document.getElementById(id)
+    if (outCell.value) {
+        return
+    }
+    let tcIn
+    try {
+        tcIn = new Timecode(inInput.value, 25)
+    } catch (error) {
+        inInput.classList.add("invalid")
+        return
+    }
+    tcIn.add("00:00:00:01")
+    outCell.value = tcIn.toString()
+    outCell.dispatchEvent(new Event("blur"))
+}
+
+function checkDuration() {
+    let inInput = document.getElementById("in")
+    let outInput = document.getElementById("out")
+    let warnDur = document.getElementById("warnDur")
+
+    warnDur.innerText = ""
+    inInput.classList.remove("invalid")
+    outInput.classList.remove("invalid")
+
+    if (inInput.value && outInput.value) {
+        try {
+            let tcIn = new Timecode(inInput.value, 25)
+            let tcOut = new Timecode(outInput.value, 25)
+            tcOut.subtract(tcIn)
+        } catch (error) {
+            if (error == "Error: Negative timecodes not supported") {
+                warnDur.innerText = "Stopáž pořadu je negativní."
+            }
+            inInput.classList.add("invalid")
+            outInput.classList.add("invalid")
+            return
+        }
+    }
+}
+
+function addListeners() {
+    let elements = document.getElementById("form").elements
+    for (let element of elements) {
+        if (element.name == "nazevEpizody" || element.name == "pp" || element.type == "submit") {
+            continue
+        }
+        else if (element.classList.contains("tc")) {
+            element.addEventListener("blur", () => formatTc(element))
+            if (element.id === "in" || element.id === "out") {
+                element.addEventListener("blur", checkDuration)
+            }
+        }
+        else if (element.name == "idec") {
+            element.addEventListener("blur", () => formatIdec(element))
+        }
+        else if (element.name == "komentar") {
+            element.addEventListener("click", () => commentCheck(element))
+        }
+        else if (element.name == "status") {
+            element.addEventListener("change", () => koprSelection(element))
+        }
+        else if (element.type == "button") {
+            if (element.id == "plusBreak") {
+                element.addEventListener("click", () => addBreak())
+            }
+            else {
+                element.addEventListener("click", () => deleteBreak())
+            }
+        }
+        else {
+            element.addEventListener("blur", () => isFilled(element))
+        }
+    }
+}
 
 const query = window.location.search
 const houseId = new URLSearchParams(query).get("houseId")
 const warning = document.getElementById("warning")
 
+addListeners()
 if (query) {
     fetch(`/api/search${query}`)
     .then(response => {
@@ -187,45 +266,16 @@ if (query) {
 let select = document.getElementById("status")
 select.prev = select.value
 
-let elements = document.getElementById("form").elements
-for (let element of elements) {
-    if (element.name == "nazevEpizody" || element.name == "pp" || element.type == "submit") {
-        continue
-    }
-    else if (element.classList.contains("tc")) {
-        element.addEventListener("blur", () => formatTc(element))
-    }
-    else if (element.name == "idec") {
-        element.addEventListener("blur", () => formatIdec(element))
-    }
-    else if (element.name == "komentar") {
-        element.addEventListener("click", () => commentCheck(element))
-    }
-    else if (element.name == "status") {
-        element.addEventListener("change", () => koprSelection(element))
-    }
-    else if (element.type == "button") {
-        if (element.id == "plusBreak") {
-            element.addEventListener("click", () => addBreak())
-        }
-        else {
-            element.addEventListener("click", () => deleteBreak())
-        }
-    }
-    else {
-        element.addEventListener("blur", () => isFilled(element))
-    }
-}
 
 document.addEventListener("submit", (event) => {
     event.preventDefault()
     let valid = true
-    warning.innerHTML = ""
+    warning.innerText = ""
     for (let element of event.target.elements) {
         element.classList.remove("invalid")
         element.dispatchEvent(new Event("blur"))
         if (element.classList.contains("invalid")) {
-            warning.innerHTML = "Některá pole nejsou správně vyplněna."
+            warning.innerText = "Některá pole nejsou správně vyplněna."
             valid = false
         }
     }
@@ -238,20 +288,10 @@ document.addEventListener("submit", (event) => {
 
         let tcIn = new Timecode(data["in"], 25)
         let tcOut = new Timecode(data["out"], 25)
-        try {
-            let dur = tcOut.subtract(tcIn)
-            dur.add(1)
-            data["dur"] = dur.toString()
-        } catch (error) {
-            if (error == "Error: Negative timecodes not supported") {
-                warning.innerHTML += "\nStopáž pořadu je negativní."
-                let inInput = document.getElementById("in")
-                let outInput = document.getElementById("out")
-                inInput.classList.add("invalid")
-                outInput.classList.add("invalid")
-                return
-            }
-        }
+        let dur = tcOut.subtract(tcIn)
+        dur.add(1)
+        data["dur"] = dur.toString()
+
 
         let url = "/api"
         let reqMethod = "POST"

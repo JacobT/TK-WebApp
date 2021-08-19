@@ -13,30 +13,30 @@
     <nav>
       <ul>
         <div id="filters">
-          <li name="all">VŠE</li>
-          <li name="status=koprCeka">NA KOPR</li>
-          <li name="status=koprOk">KOPR OK</li>
-          <li name="status=koprProvys">KOPR OK - ČEKÁ NA PROVYS</li>
-          <li name="status=koprNg_vys">NG_VYSÍLATELNÉ</li>
-          <li name="status=koprNg_nevys">NG_NEVYSÍLATELNÉ</li>
+          <li id="all">VŠE</li>
+          <li id="status=koprCeka">NA KOPR</li>
+          <li id="status=koprOk">KOPR OK</li>
+          <li id="status=koprProvys">KOPR OK - ČEKÁ NA PROVYS</li>
+          <li id="status=koprNg_vys">NG_VYSÍLATELNÉ</li>
+          <li id="status=koprNg_nevys">NG_NEVYSÍLATELNÉ</li>
         </div>
-        <li><a href="form.html" target="_blank">NOVÝ</a></li>
-        <div class="searchBox">
+        <a href="form.html" target="_blank"><li>NOVÝ</li></a>
+        <li class="searchBox">
           <label for="search">Vyhledat:</label><input type="text" id="search" placeholder="House ID">
-        </div>
+        </li>
       </ul>
     </nav>
 
     <table>
       <thead>
         <tr>
-          <th>House ID</th>
-          <th>IDEC</th>
-          <th>Název pořadu</th>
-          <th>Název epizody</th>
+          <th id="houseId" class="sort">House ID</th>
+          <th id="idec" class="sort">IDEC</th>
+          <th id="nazevPoradu" class="sort">Název pořadu</th>
+          <th id="nazevEpizody" class="sort">Název epizody</th>
           <th>Stopáž</th>
-          <th>Datum vysílání</th>
-          <th>Stav</th>
+          <th id="datumVys" class="sort">Datum vysílání</th>
+          <th id="status" class="sort">Stav</th>
           <th>Edit</th>
         </tr>
       </thead>

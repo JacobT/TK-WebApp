@@ -3,13 +3,12 @@ class TableContent {
     constructor() {
         this.table = document.getElementById("baseTable")
         this.storage = window.sessionStorage
-        this.filters = document.getElementById("filters").children
         this.searchInput = document.getElementById("search")
         this.addListeners()
         this.reload()
     }
 
-    print(data) {
+    print(data = []) {
         let newTable = document.createElement("tbody")
         newTable.id = "baseTable"
         if (data.length == 0) {
@@ -18,14 +17,32 @@ class TableContent {
             cell.colSpan = this.table.parentElement.rows[0].cells.length
             cell.innerHTML = "Nebyly nalezeny žádné pořady."
         } else {
+            let sortField = this.storage.getItem("sortField")
+            let sortReverse = this.storage.getItem("sortReverse")
+            if (sortField) {
+                this.sortData(data, sortField)
+            }
+            if (sortReverse === "true") {
+                data.reverse()
+            }
+
             for (let entry of data) {
                 let row = newTable.insertRow()
 
                 row.addEventListener("click", (e) => {
                     if (e.target.nodeName !== "BUTTON") {
-                        this.highlight(row)
+                        this.highlight(row, entry.houseId)
                     }
                 })
+
+                let highlight = this.storage.getItem("highlight")
+                if (highlight === null) {
+                    this.storage.setItem("highlight", "")
+                    highlight = ""
+                }
+                if (highlight.includes(entry.houseId)) {
+                    this.highlight(row, entry.houseId)
+                }
 
                 row.insertCell().innerHTML = entry.houseId
                 row.insertCell().innerHTML = entry.idec
@@ -67,12 +84,14 @@ class TableContent {
                 let delBtn = document.createElement("button")
                 delBtn.innerHTML = "Delete"
                 delBtn.addEventListener ("click", () => {
-                    fetch(`/api/${entry.houseId}`, {method: "DELETE"})
-                        .then((response) => {
-                            if (response.ok == true && response.status == 200) {
-                                location.reload()
-                            }
-                        })
+                    if (confirm(`Opravdu chcete smazat ${entry.houseId}`)) {
+                        fetch(`/api/${entry.houseId}`, {method: "DELETE"})
+                            .then((response) => {
+                                if (response.ok == true && response.status == 200) {
+                                    this.reload()
+                                }
+                            })
+                    }
                 })
                 editCell.appendChild(delBtn)
             }
@@ -81,19 +100,26 @@ class TableContent {
         this.table = newTable
     }
 
-    highlight (element) {
+    highlight (element, houseId) {
+        let highlight = this.storage.getItem("highlight")
         if (element.classList.contains("highlight")) {
             element.classList.remove("highlight")
+            highlight = highlight.replace(houseId, "")
+            this.storage.setItem("highlight", highlight)
         }
         else {
             element.classList.add("highlight")
+            if (!highlight.includes(houseId)) {
+                highlight += houseId
+                this.storage.setItem("highlight", highlight)
+            }
         }
     }
 
     search(query) {
         let url = ""
         if (!query || query === "all") {
-            url = `/api/search`
+            url = `/api`
         }
         else {
             url = `/api/search?${query}`
@@ -101,58 +127,171 @@ class TableContent {
         
         fetch(url).then(response => {
             if (response.ok && response.status === 200) {
-                console.log(200)
                 return response.json()
             }
-            else if (response.status === 304) {   // not getting 304
-                console.log(304)
+            else {
+                this.print()
             }
         }).then(data => {
-            console.log(data)
             if (data) {
                 this.print(data)
-                this.storage.setItem("filter", query)
-                this.setActive(query)
             }
         })
+        this.storage.setItem("filter", query)
+        this.setActive(query)
     }
 
     addListeners() {
         this.searchInput.addEventListener("keypress", (e) => {
             if (e.key === "Enter") {
-                let query = "houseId=" + this.searchInput.value
-                table.search(query)
-                this.searchInput.value = ""
+                if (this.searchInput.value) {
+                    let query = "houseId=" + this.searchInput.value
+                    table.search(query)
+                }
+                else {
+                    table.search("all")
+                }
             }
         })
-        for (let li of this.filters) {
+
+        let filters = document.getElementById("filters").children
+        for (let li of filters) {
             li.addEventListener("click", () => {
-                this.search(li.getAttribute("name"))
+                this.search(li.id)
             })
+        }
+
+        let headers = document.getElementsByTagName("th")
+        for (let header of headers) {
+            if (header.id) {
+                header.addEventListener("click", () => {
+                    let sortFieldId = this.storage.getItem("sortField")
+                    if (sortFieldId !== header.id && sortFieldId) {
+                        let sortField = document.getElementById(sortFieldId)
+                        sortField.classList.remove("ascending")
+                        sortField.classList.remove("descending")
+                    }
+                    
+                    if (header.classList.contains("ascending")) {
+                        header.classList.remove("ascending")
+                        header.classList.add("descending")
+                        this.storage.setItem("sortField", header.id)
+                        this.storage.setItem("sortReverse", "true")
+                    }
+                    else if (header.classList.contains("descending")) {
+                        header.classList.remove("descending")
+                        this.storage.setItem("sortField", "")
+                        this.storage.setItem("sortReverse", "false")
+                    }
+                    else {
+                        header.classList.add("ascending")
+                        this.storage.setItem("sortField", header.id)
+                        this.storage.setItem("sortReverse", "false")
+                    }
+                    this.reload()
+                })
+            }
+        }
+        let sortFieldId = this.storage.getItem("sortField")
+        if (sortFieldId) {
+            let sortField = document.getElementById(sortFieldId)
+            let sortReverse = this.storage.getItem("sortReverse")
+            if (sortReverse === "false") {
+                sortField.classList.add("ascending")
+            }
+            else {
+                sortField.classList.add("descending")
+            }
         }
     }
 
-    setActive(eleName) {
-        for (let li of this.filters) {
+    setActive(elementId) {
+        let actives = document.getElementsByClassName("active")
+        for (let li of actives) {
             li.classList.remove("active")
         }
-        if (eleName.startsWith("status") || eleName === "all") {
-            let activeElement = document.getElementsByName(eleName)[0]
+        this.searchInput.value = ""
+        
+        if (elementId.startsWith("status") || elementId === "all") {
+            let activeElement = document.getElementById(elementId)
             activeElement.classList.add("active")
+        }
+        else if (elementId.startsWith("houseId")) {
+            elementId = elementId.split("=")[1]
+            this.searchInput.value = elementId
         }
     }
 
     reload() {
         let filter = this.storage.getItem("filter")
-        if (filter === null) {
+        if (filter === null || filter == "undefined") {
             filter = "all"
         }
-        if (filter !== "undefined") {
-            this.search(filter)
+        this.search(filter)
+    }
+
+    sortData(array, field) {
+        switch (field) {
+            case "idec":
+                function sortByIdec(a, b, index) {
+                    if (index == a.length || index == b.length) {
+                        return 0
+                    }
+    
+                    let aNum = parseInt(a[index])
+                    let bNum = parseInt(b[index])
+                    let result = aNum - bNum
+    
+                    if (result == 0) {
+                        return sortByIdec(a, b, index + 1)
+                    }
+                    else {
+                        return result
+                    }
+                }
+    
+                array = array.sort((a, b) => {
+                    a = a.idec.split("/")
+                    b = b.idec.split("/")
+                    return sortByIdec(a, b, 0)
+                })
+                break
+            case "datumVys":
+                array = array.sort((a, b) => {
+                    let aDate = new Date(a.datumVys)
+                    let bDate = new Date(b.datumVys)
+                    if (aDate < bDate) {
+                        return -1
+                    }
+                    else if (aDate > bDate) {
+                        return 1
+                    }
+                    else {
+                        return 0
+                    }
+                })
+                break
+            case "status":
+                let statusEnum = {
+                    "koprCeka": 1,
+                    "koprOk": 2,
+                    "koprProvys": 3,
+                    "koprNg_vys": 4,
+                    "koprNg_nevys": 5
+                }
+                array = array.sort((a, b) => {
+                    return statusEnum[a.status] - statusEnum[b.status]
+                })
+                break
+            default:
+                array = array.sort((a, b) => {
+                    a = a[field].toUpperCase()
+                    b = b[field].toUpperCase()
+                    return a.localeCompare(b)
+                })
+                break
         }
-        else {
-            this.search()
-        }
+        return array
     }
 }
 
@@ -167,5 +306,5 @@ window.addEventListener("storage", () => {
 })
 
 window.addEventListener("DOMContentLoaded", () => {
-    setInterval(() => table.reload(), 10000)
+    setInterval(() => table.reload(), 300000)
 })

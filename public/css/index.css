@@ -28,14 +28,13 @@ li {
 }
 
 a {
-  color: whitesmoke;
   text-decoration: none;
 }
 
-li:hover,
-a:hover {
+li:hover {
   color: black;
   background-color: lightslategray;
+  cursor: pointer;
 }
 
 table,
@@ -67,16 +66,18 @@ tr {
   background-color: whitesmoke;
 }
 
-.highlight,
+.highlight > td,
 tr:hover > td {
+  color: black;
   background-color: lightslategray;
 }
 
-.searchBox {
+li.searchBox {
   float: right;
-  margin-top: 5px;
-  margin-right: 1%;
-  padding: 5px;
+  padding: 8px;
+  background-color: darkslategray;
+  border-right: none;
+  cursor: auto;
 }
 
 label {
@@ -84,13 +85,21 @@ label {
   margin-right: 5px;
 }
 
-.navRight {
-  float: right;
-  border-left: 1px solid black;
-  border-right: none;
-}
-
 .active {
   color: black;
   background-color: aquamarine;
+}
+
+.ascending,
+.descending {
+  color: black;
+  background-color: lightslategray;
+}
+
+.ascending::after {
+  content: " \25b2";
+}
+
+.descending::after {
+  content: " \25bc";
 }
